@@ -1,7 +1,6 @@
-import joblib
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+import pickle
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
 
 # Sample data
 texts = [
@@ -12,19 +11,16 @@ texts = [
     "The support team was very helpful.",
     "Worst decision of my life."
 ]
-labels = [1, 0, 1, 0, 1, 0]  # 1 = Positive, 0 = Negative
+labels = [1, 0, 1, 0, 1, 0]  # 1 = positive, 0 = negative
 
-# Step 1: Text processing
-vectorizer = TfidfVectorizer()
+# Preprocess and train
+vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(texts)
+model = MultinomialNB()
+model.fit(X, labels)
 
-# Step 2: Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
+# Save model and vectorizer together
+with open('ml/model.pkl', 'wb') as f:
+    pickle.dump((model, vectorizer), f)
 
-# Step 3: Train model
-model = LogisticRegression()
-model.fit(X_train, y_train)
-
-# Save the model and vectorizer
-joblib.dump(model, "ml/model.pkl")
-joblib.dump(vectorizer, "ml/vectorizer.pkl")
+print("Model and vectorizer saved to 'ml/model.pkl'")
